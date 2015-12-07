@@ -37,5 +37,12 @@ class JSONConfigLoader():
         if self.__loaded_config_file is None:
             raise ConfigLoaderException("Load not called yet!")
 
+        data = None
+        try:
+            data = json.dumps(config)
+        except Exception as e:
+            raise ConfigLoaderException("Config data is not JSON serializable: %s" % e)
+            return
+
         with open(self.__loaded_config_file, 'w') as f:
-            f.write(json.dumps(config))
+            f.write(data)
