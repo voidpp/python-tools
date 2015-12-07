@@ -2,11 +2,13 @@
 import os
 import json
 
+from .json_encoder import JsonEncoder
+
 class ConfigLoaderException(Exception):
     pass
 
 class JSONConfigLoader():
-    def __init__(self, base_path):
+    def __init__(self, base_path, encoder = JsonEncoder):
         self.sources = [
             os.path.dirname(os.getcwd()),
             os.path.dirname(os.path.abspath(base_path)),
@@ -14,6 +16,7 @@ class JSONConfigLoader():
             '/etc',
         ]
         self.__loaded_config_file = None
+        self.__encoder = encoder
 
     def load(self, filename, create = None, default_conf = {}):
         tries = []
@@ -39,7 +42,7 @@ class JSONConfigLoader():
 
         data = None
         try:
-            data = json.dumps(config)
+            data = json.dumps(config, cls = self.__encoder)
         except Exception as e:
             raise ConfigLoaderException("Config data is not JSON serializable: %s" % e)
             return
