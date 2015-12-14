@@ -18,6 +18,10 @@ class JSONConfigLoader():
         self.__loaded_config_file = None
         self.__encoder = encoder
 
+    @property
+    def filename(self):
+        return self.__loaded_config_file
+
     def load(self, filename, create = None, default_conf = {}):
         tries = []
         for source in self.sources:
