@@ -1,12 +1,12 @@
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 class HTTP(object):
 
     @staticmethod
     def load_url(url, data = None, headers = {}):
-        req = urllib2.Request(url, data, headers)
-        response = urllib2.urlopen(req)
+        req = urllib.request.Request(url, data, headers)
+        response = urllib.request.urlopen(req)
         return response
 
     @staticmethod
