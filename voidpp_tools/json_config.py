@@ -3,53 +3,20 @@ import os
 import json
 
 from .json_encoder import JsonEncoder
+from .config_loader import ConfigLoader, ConfigFormatter
 
-class ConfigLoaderException(Exception):
-    pass
+class JSONConfigFormatter(ConfigFormatter):
 
-class JSONConfigLoader():
-    def __init__(self, base_path, encoder = JsonEncoder):
-        self.sources = [
-            os.path.dirname(os.getcwd()),
-            os.path.dirname(os.path.abspath(base_path)),
-            os.path.expanduser('~'),
-            '/etc',
-        ]
-        self.__loaded_config_file = None
+    def __init__(self, encoder):
         self.__encoder = encoder
 
-    @property
-    def filename(self):
-        return self.__loaded_config_file
+    def encode(self, data):
+        return json.dumps(data, cls = encoder)
 
-    def load(self, filename, create = None, default_conf = {}):
-        tries = []
-        for source in self.sources:
-            file_path = os.path.join(source, filename)
-            tries.append(file_path)
-            if not os.path.exists(file_path):
-                continue
-            self.__loaded_config_file = file_path
-            with open(file_path) as f:
-                return json.load(f)
+    def decode(self, data):
+        return json.loads(data)
 
-        if create is not None:
-            self.__loaded_config_file = os.path.join(create, filename)
-            self.save(default_conf)
-            return default_conf
-
-        raise ConfigLoaderException("Config file not found in: %s" % tries)
-
-    def save(self, config):
-        if self.__loaded_config_file is None:
-            raise ConfigLoaderException("Load not called yet!")
-
-        data = None
-        try:
-            data = json.dumps(config, cls = self.__encoder)
-        except Exception as e:
-            raise ConfigLoaderException("Config data is not JSON serializable: %s" % e)
-            return
-
-        with open(self.__loaded_config_file, 'w') as f:
-            f.write(data)
+# this is a backward compatibility class, because the loader refactored to a format independent ConfigLoader class
+class JSONConfigLoader(ConfigLoader):
+    def __init__(self, base_path, encoder = JsonEncoder):
+        super(JSONConfigLoader, self).__init__(JSONConfigFormatter(encoder), base_path)
