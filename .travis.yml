@@ -1,0 +1,7 @@
+language: python
+python:
+    - "3.4"
+install: "pip install -r test/requirements.txt"
+script: nosetests --with-coverage --cover-package=voidpp_tools
+after_success:
+  coveralls
