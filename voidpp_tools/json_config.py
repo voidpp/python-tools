@@ -18,5 +18,5 @@ class JSONConfigFormatter(ConfigFormatter):
 
 # this is a backward compatibility class, because the loader refactored to a format independent ConfigLoader class
 class JSONConfigLoader(ConfigLoader):
-    def __init__(self, base_path, encoder = JsonEncoder):
-        super(JSONConfigLoader, self).__init__(JSONConfigFormatter(encoder), base_path)
+    def __init__(self, base_path, encoder = JsonEncoder, nested = False):
+        super(JSONConfigLoader, self).__init__(JSONConfigFormatter(encoder), base_path, nested)

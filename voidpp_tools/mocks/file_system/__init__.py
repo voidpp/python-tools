@@ -5,7 +5,7 @@ from functools import wraps
 
 from .handlers import MockHandlers
 
-def mockfs(data, cwd = '/', user = 'douglas'):
+def mockfs(data = {}, cwd = '/', user = 'douglas'):
     def wrapper(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
