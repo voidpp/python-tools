@@ -6,3 +6,5 @@ python-tools
 misc python tools
 
 package name: voidpp-tools
+
+module name: voidpp_tools
