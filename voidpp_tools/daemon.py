@@ -53,10 +53,12 @@ class Daemon(object):
         # write pidfile
         atexit.register(self.delpid)
         pid = str(os.getpid())
-        file(self.pidfile,'w+').write("%s\n" % pid)
+        with open(self.pidfile,'w+') as f:
+            f.write("%s\n" % pid)
 
     def delpid(self):
-        os.remove(self.pidfile)
+        if os.path.exists(self.pidfile):
+            os.remove(self.pidfile)
 
     def get_pid(self):
         pid = None
