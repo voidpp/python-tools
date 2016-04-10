@@ -2,6 +2,8 @@
 import sys, os, time, atexit
 from signal import SIGTERM
 
+from .logger_proxy import LoggerProxy
+
 class Daemon(object):
     """
     A generic daemon class.
@@ -55,6 +57,9 @@ class Daemon(object):
         pid = str(os.getpid())
         with open(self.pidfile,'w+') as f:
             f.write("%s\n" % pid)
+
+        sys.stdout = LoggerProxy(self.logger.info)
+        sys.stderr = LoggerProxy(self.logger.error)
 
     def delpid(self):
         if os.path.exists(self.pidfile):
