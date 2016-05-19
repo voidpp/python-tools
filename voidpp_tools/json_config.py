@@ -11,7 +11,7 @@ class JSONConfigFormatter(ConfigFormatter):
         self.__encoder = encoder
 
     def encode(self, data):
-        return json.dumps(data, cls = encoder)
+        return json.dumps(data, cls = self.__encoder)
 
     def decode(self, data):
         return json.loads(data)
