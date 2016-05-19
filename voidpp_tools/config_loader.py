@@ -38,7 +38,7 @@ class ConfigLoader(object):
     """
     def __init__(self, formatter, base_path, nested = False):
         self.sources = [
-            os.path.dirname(os.getcwd()),
+            os.getcwd(),
             os.path.dirname(os.path.abspath(base_path)),
             os.path.expanduser('~'),
             '/etc',
