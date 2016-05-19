@@ -5,7 +5,8 @@ from .dict_utils import recursive_update
 class ConfigLoaderException(Exception):
     pass
 
-class ConfigFormatter(object, metaclass=abc.ABCMeta):
+class ConfigFormatter(object):
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def encode(self, data):

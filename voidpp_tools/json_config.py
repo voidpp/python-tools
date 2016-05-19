@@ -3,7 +3,7 @@ import os
 import json
 
 from .json_encoder import JsonEncoder
-from .config_loader import ConfigLoader, ConfigFormatter
+from .config_loader import ConfigLoader, ConfigFormatter, ConfigLoaderException
 
 class JSONConfigFormatter(ConfigFormatter):
 
