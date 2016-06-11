@@ -3,7 +3,7 @@ import unittest
 
 from voidpp_tools.mocks.file_system import mockfs
 from voidpp_tools.json_config import JSONConfigLoader
-from voidpp_tools.config_loader import ConfigLoaderException
+from voidpp_tools.config_loader import ConfigFileNotFoundException
 
 class TestConfigLoader(unittest.TestCase):
 
@@ -24,7 +24,7 @@ class TestConfigLoader(unittest.TestCase):
         loader = JSONConfigLoader('')
 
         # Act & Assert
-        with self.assertRaises(ConfigLoaderException):
+        with self.assertRaises(ConfigFileNotFoundException):
             data = loader.load("app1.json")
 
     @mockfs(dict(

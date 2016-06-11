@@ -5,6 +5,9 @@ from .dict_utils import recursive_update
 class ConfigLoaderException(Exception):
     pass
 
+class ConfigFileNotFoundException(Exception):
+    pass
+
 class ConfigFormatter(object):
     __metaclass__ = abc.ABCMeta
 
@@ -86,7 +89,7 @@ class ConfigLoader(object):
             Return value of the ConfigFormatter.decode or the default_conf value
 
         Raises:
-            ConfigLoaderException: if the config file not found
+            ConfigFileNotFoundException: if the config file not found
 
         """
         filenames, tries = self.__search_config_files(filename)
@@ -100,7 +103,7 @@ class ConfigLoader(object):
             self.save(default_conf)
             return default_conf
 
-        raise ConfigLoaderException("Config file not found in: %s" % tries)
+        raise ConfigFileNotFoundException("Config file not found in: %s" % tries)
 
     def save(self, data):
         """Save the config data
