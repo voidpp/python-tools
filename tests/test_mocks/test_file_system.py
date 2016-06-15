@@ -4,12 +4,14 @@ from copy import copy
 
 from voidpp_tools.mocks.file_system import FileSystem
 
+from voidpp_tools.compat import FileNotFoundError
+
 init_data = dict(
-    filename1 = "content of filename 1",
+    filename1 = u"content of filename 1",
     dir1 = dict(
-        filename1 = "content of filename 2 in dir 1",
+        filename1 = u"content of filename 2 in dir 1",
         dir2 = dict(
-            filename2 = "content of filename 2 in dir 2",
+            filename2 = u"content of filename 2 in dir 2",
         ),
     ),
 )

@@ -7,7 +7,7 @@ from voidpp_tools.config_loader import ConfigFileNotFoundException
 
 class TestConfigLoader(unittest.TestCase):
 
-    @mockfs(dict(etc = {'app1.json': '{"the_answer": 42}'}))
+    @mockfs(dict(etc = {'app1.json': u'{"the_answer": 42}'}))
     def test_load_config_from_etc(self):
         # Arrange
         loader = JSONConfigLoader('')
@@ -28,8 +28,8 @@ class TestConfigLoader(unittest.TestCase):
             data = loader.load("app1.json")
 
     @mockfs(dict(
-        etc = {'app1.json': '{"the_answer": 42}'},
-        home = dict(douglas = {'app1.json': '{"the_question": "6*7"}'})
+        etc = {'app1.json': u'{"the_answer": 42}'},
+        home = dict(douglas = {'app1.json': u'{"the_question": "6*7"}'})
     ), user = 'douglas')
     def test_load_config_nested(self):
         # Arrange

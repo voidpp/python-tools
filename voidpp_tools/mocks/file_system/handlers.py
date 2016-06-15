@@ -1,13 +1,14 @@
 import os
 from io import StringIO
 from .utils import override
+from voidpp_tools.compat import builtins, FileNotFoundError
 
 class MockHandlers(object):
 
     def __init__(self, file_system):
         self.__file_system = file_system
 
-    @override('builtins.open')
+    @override(builtins + '.open')
     def open(self, filename, mode = 'r'):
         data = self.__file_system.get_data(filename)
         if data is None:

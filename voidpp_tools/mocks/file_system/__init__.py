@@ -1,7 +1,8 @@
 import os
 from contextlib import contextmanager
-from unittest.mock import patch
 from functools import wraps
+
+from voidpp_tools.compat import mock
 
 from .handlers import MockHandlers
 
@@ -58,7 +59,7 @@ class FileSystem(object):
 
         patchers = []
         for name, function in functions.items():
-            patcher = patch(name, function)
+            patcher = mock.patch(name, function)
             patchers.append(patcher)
 
         return patchers
