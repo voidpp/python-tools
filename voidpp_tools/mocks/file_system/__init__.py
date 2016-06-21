@@ -46,6 +46,13 @@ class FileSystem(object):
                 return None
         return data
 
+    def set_data(self, path, content):
+        data = self.__data
+        paths = path.strip(os.path.sep).split(os.path.sep)
+        for part in paths[:-1]:
+            data = data[part]
+        data[paths[-1]] = content
+
     def __collect_mocks(self, obj):
         functions = {}
         for name in dir(obj):

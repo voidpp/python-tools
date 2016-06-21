@@ -1,5 +1,6 @@
 import sys
 import importlib
+from io import UnsupportedOperation
 
 def __compat(data):
     try:
@@ -19,7 +20,16 @@ builtins = __compat({
 })
 
 FileNotFoundError = __compat({
-    2: lambda: OSError,
+    2: lambda: IOError,
     3: lambda: FileNotFoundError,
 })
 
+FileExistsError = __compat({
+    2: lambda: OSError,
+    3: lambda: FileExistsError,
+})
+
+UnsupportedOperation = __compat({
+    2: lambda: IOError,
+    3: lambda: UnsupportedOperation, 
+})
