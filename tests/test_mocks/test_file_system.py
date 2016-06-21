@@ -71,14 +71,65 @@ class TestFileSystem(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 open('filename2')
 
-    def test_is_file_exists(self):
+    def test_is_path_exists_with_file(self):
         # Arrange
         data = copy(init_data)
         fs = FileSystem(data)
 
         # Act & Assert
         with fs.mock():
-            self.assertEqual(os.path.exists('filename1'), True)
+            self.assertTrue(os.path.exists('filename1'))
+            self.assertFalse(os.path.exists('filename2'))
+
+    def test_is_path_exists_with_dir(self):
+        # Arrange
+        data = copy(init_data)
+        fs = FileSystem(data)
+
+        # Act & Assert
+        with fs.mock():
+            self.assertTrue(os.path.exists('dir1'))
+            self.assertFalse(os.path.exists('dir2'))
+
+    def test_is_file_with_file(self):
+        # Arrange
+        data = copy(init_data)
+        fs = FileSystem(data)
+
+        # Act & Assert
+        with fs.mock():
+            self.assertTrue(os.path.isfile('filename1'))
+            self.assertFalse(os.path.isfile('filename2'))
+
+    def test_is_file_with_dir(self):
+        # Arrange
+        data = copy(init_data)
+        fs = FileSystem(data)
+
+        # Act & Assert
+        with fs.mock():
+            self.assertTrue(os.path.exists('dir1'))
+            self.assertFalse(os.path.isfile('dir1'))
+
+    def test_is_dir_with_file(self):
+        # Arrange
+        data = copy(init_data)
+        fs = FileSystem(data)
+
+        # Act & Assert
+        with fs.mock():
+            self.assertTrue(os.path.isfile('filename1'))
+            self.assertFalse(os.path.isdir('filename1'))
+
+    def test_is_dir_with_dir(self):
+        # Arrange
+        data = copy(init_data)
+        fs = FileSystem(data)
+
+        # Act & Assert
+        with fs.mock():
+            self.assertTrue(os.path.exists('dir1'))
+            self.assertFalse(os.path.exists('dir2'))
 
     def test_file_write(self):
         # Arrange

@@ -80,3 +80,12 @@ class MockHandlers(object):
                 raise FileNotFoundError("No such file or directory: '{}'".format(path))
         else:
             raise FileExistsError("File exists: '{}'".format(path))
+
+    @override('os.path.isfile')
+    def isfile(self, path):
+        data = self.__file_system.get_data(path)
+        return False if (isinstance(data, dict) or data is None) else True
+
+    @override('os.path.isdir')
+    def isdir(self, path):
+        return isinstance(self.__file_system.get_data(path), dict)
