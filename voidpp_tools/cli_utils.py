@@ -6,7 +6,7 @@ def confirm_prompt(msg = "Are you sure?", help = "(ok: enter, cancel: ctrl+c)"):
         return True
     except KeyboardInterrupt:
         # for new line
-        print('')
+        print('\nCancelled')
         return False
 
 def get_func_defaults(func):
