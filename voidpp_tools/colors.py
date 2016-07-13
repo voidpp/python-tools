@@ -34,8 +34,8 @@ class ColorFactory(object):
 
 class ColoredLoggerFormatter(logging.Formatter):
 
-    def __init__(self, debug):
-        super(ColoredFormatter, self).__init__()
+    def __init__(self, debug = False):
+        super(ColoredLoggerFormatter, self).__init__()
         self.debug = debug
 
     def format(self, record):
