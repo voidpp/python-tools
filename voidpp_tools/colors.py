@@ -1,6 +1,7 @@
 
 import os
 import sys
+import logging
 
 class Colors(object):
     green = '\033[1;32m'
@@ -30,3 +31,30 @@ class ColorFactory(object):
         supp = ColorFactory.is_output_supports_color()
         attrs = {k: getattr(Colors,k) if supp else '' for k in dir(Colors) if k[0] != '_'}
         return type('Colors', (object,), attrs)
+
+class ColoredLoggerFormatter(logging.Formatter):
+
+    def __init__(self, debug):
+        super(ColoredFormatter, self).__init__()
+        self.debug = debug
+
+    def format(self, record):
+        colors = {
+            logging.ERROR: Colors.red,
+            logging.WARNING: Colors.yellow,
+            logging.INFO: Colors.default,
+            logging.DEBUG: Colors.cyan
+        }
+
+        if self.debug:
+            msg = '%s - %s:%s: ' % (datetime.now(), record.name, record.lineno)
+            msg += Colors.default + record.getMessage()
+        else:
+            msg = record.getMessage()
+
+        msg = colors.get(record.levelno, Colors.default) + msg + Colors.default
+
+        if record.exc_info:
+            msg += '\n' + self.formatException(record.exc_info)
+
+        return msg
