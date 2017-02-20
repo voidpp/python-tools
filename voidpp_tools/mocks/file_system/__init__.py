@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from functools import wraps
 
 from voidpp_tools.compat import mock
+from voidpp_tools.compat import FileNotFoundError
 
 from .handlers import MockHandlers
 
@@ -46,10 +47,17 @@ class FileSystem(object):
                 return None
         return data
 
-    def set_data(self, path, content):
+    def set_data(self, path, content, create_folders = False):
         data = self.__data
         paths = path.strip(os.path.sep).split(os.path.sep)
+        visited = []
         for part in paths[:-1]:
+            visited.append(part)
+            if part not in data:
+                if create_folders:
+                    data[part] = {}
+                else:
+                    raise FileNotFoundError("Cannot set data for '{}', because '/{}' does not exists!".format(path, os.path.join(*visited)))
             data = data[part]
         data[paths[-1]] = content
 

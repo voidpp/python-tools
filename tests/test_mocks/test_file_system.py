@@ -18,6 +18,27 @@ init_data = dict(
 
 class TestFileSystem(unittest.TestCase):
 
+    def test_set_data_folder_not_exists(self):
+        # Arrange
+        fs = FileSystem({})
+
+        # Act & Assert
+        with self.assertRaises(FileNotFoundError) as e:
+            fs.set_data('/var/lib/filename1', "content1")
+
+    def test_set_data_folder_not_exists_so_create(self):
+        # Arrange
+        data = {}
+        fs = FileSystem(data)
+
+        # Act
+        fs.set_data('/var/lib/filename1', "content1", create_folders = True)
+
+        # Assert
+        self.assertIn('var', data)
+        self.assertIn('lib', data['var'])
+        self.assertEqual(fs.get_data('/var/lib/filename1'), "content1")
+
     def test_get_data_simple_existing(self):
         # Arrange
         data = copy(init_data)
