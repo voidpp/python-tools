@@ -289,3 +289,17 @@ class TestFileSystem(unittest.TestCase):
         with fs.mock():
             with self.assertRaises(FileNotFoundError):
                 os.mkdir('/dirX/dir3/')
+
+    def test_chmod(self):
+        # Arrange
+        fs = FileSystem({})
+
+        with fs.mock():
+            os.chmod('/noooo/fff.txt', 42)
+
+    def test_stat(self):
+        # Arrange
+        fs = FileSystem({})
+
+        with fs.mock():
+            os.stat('/noooo/fff.txt')

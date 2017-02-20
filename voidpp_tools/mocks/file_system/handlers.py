@@ -3,6 +3,11 @@ from io import StringIO
 from .utils import override
 from voidpp_tools.compat import builtins, FileNotFoundError, FileExistsError, UnsupportedOperation
 
+class stat_result(object):
+
+    def __getattr__(self, name):
+        return 0
+
 class MockStringIO(StringIO):
     def __init__(self, filename, mock_fs, mode):
         super(MockStringIO, self).__init__()
@@ -89,3 +94,12 @@ class MockHandlers(object):
     @override('os.path.isdir')
     def isdir(self, path):
         return isinstance(self.__file_system.get_data(path), dict)
+
+    @override('os.chmod')
+    def chmod(self, path, flags):
+        # TODO: maybe implement?
+        pass
+
+    @override('os.stat')
+    def stat(self, path):
+        return stat_result()
