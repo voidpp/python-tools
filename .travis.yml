@@ -2,7 +2,9 @@ language: python
 python:
     - "3.4"
     - "3.5"
-install: "pip istall -e . && pip install -r tests/requirements.txt"
+install:
+  - pip install -e .
+  - pip install -r tests/requirements.txt
 script: pytest --cov=voidpp_tools
 after_success:
   coveralls
