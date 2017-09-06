@@ -44,6 +44,9 @@ class PluginManager(object):
 
         return plugin_class
 
+    def load(self, name):
+        return self._load(self._descriptors[name])
+
     def _load(self, desc: PluginDescriptor):
 
         plugin_class = self._load_class(desc)
@@ -56,11 +59,15 @@ class PluginManager(object):
 
         return instance
 
+    def names(self):
+        for name in self._descriptors:
+            yield name
+
     def __getitem__(self, name):
         if name not in self._plugins:
             if name not in self._descriptors:
                 raise KeyError("Missing key '{}'".format(name))
-            self._plugins[name] = self._load(self._descriptors[name])
+            self._plugins[name] = self.load(name)
         return self._plugins[name]
 
     def __contains__(self, name):

@@ -1,17 +1,17 @@
 
-import os
 import json
 
 from .json_encoder import JsonEncoder
-from .config_loader import ConfigLoader, ConfigFormatter, ConfigLoaderException
+from .config_loader import ConfigLoader, ConfigFormatter
 
 class JSONConfigFormatter(ConfigFormatter):
 
-    def __init__(self, encoder):
-        self.__encoder = encoder
+    def __init__(self, encoder, indent = None):
+        self._encoder = encoder
+        self._indent = indent
 
     def encode(self, data):
-        return json.dumps(data, cls = self.__encoder)
+        return json.dumps(data, indent =  self._indent, cls = self._encoder)
 
     def decode(self, data):
         return json.loads(data)
