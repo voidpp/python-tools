@@ -19,7 +19,7 @@ def mockfs(data = {}, cwd = '/', user = 'douglas'):
 class FileSystem(object):
 
     def __init__(self, data, cwd = '/', user = 'douglas'):
-        self.__data = data
+        self._data = data
         self.cwd = cwd
         self.user = user
 
@@ -37,7 +37,7 @@ class FileSystem(object):
                 patcher.stop()
 
     def get_data(self, path):
-        data = self.__data
+        data = self._data
         for part in path.split(os.path.sep):
             if not len(part):
                 continue
@@ -47,8 +47,22 @@ class FileSystem(object):
                 return None
         return data
 
+    def remove_data(self, path): # XXX: tests!
+        data = self._data
+        for part in path.split(os.path.sep):
+            if not len(part):
+                continue
+            try:
+                if not isinstance(data[part], dict):
+                    del data[part]
+                    return True
+                data = data[part]
+            except KeyError:
+                return False
+        return False
+
     def set_data(self, path, content, create_folders = False):
-        data = self.__data
+        data = self._data
         paths = path.strip(os.path.sep).split(os.path.sep)
         visited = []
         for part in paths[:-1]:

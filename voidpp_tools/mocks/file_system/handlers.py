@@ -1,5 +1,5 @@
 import os
-from io import StringIO
+from io import StringIO, FileIO
 from .utils import override
 from voidpp_tools.compat import builtins, FileNotFoundError, FileExistsError, UnsupportedOperation
 
@@ -11,76 +11,98 @@ class stat_result(object):
 class MockStringIO(StringIO):
     def __init__(self, filename, mock_fs, mode):
         super(MockStringIO, self).__init__()
-        self.__filename = filename
-        self.__mock_fs = mock_fs
-        self.__mode = mode
-        self.__loaded = False
+        self._filename = filename
+        self._mock_fs = mock_fs
+        self._mode = mode
+        self._loaded = False
 
-    def __load(self):
-        if self.__loaded:
+    def _load(self):
+        if self._loaded:
             return
-        self.__loaded = True
-        data = self.__mock_fs.get_data(self.__filename)
-        if self.__mode.startswith('a') and data is None:
+        self._loaded = True
+        data = self._mock_fs.get_data(self._filename)
+        if self._mode.startswith('a') and data is None:
             data = u''
         super(MockStringIO, self).write(data)
-        if self.__mode.startswith('r'):
+        if self._mode.startswith('r'):
             self.seek(0)
 
     def read(self, n=None):
-        if self.__mode in ['w', 'wb']:
+        if self._mode in ['w', 'wb']:
             raise UnsupportedOperation('not readable')
-        self.__load()
+        self._load()
         return super(MockStringIO, self).read(n)
 
     def write(self, content):
-        if self.__mode in ['r', 'rb']:
+        if self._mode in ['r', 'rb']:
             raise UnsupportedOperation('not writable')
-        if self.__mode.startswith('a'):
-            self.__load()
+        if self._mode.startswith('a'):
+            self._load()
         super(MockStringIO, self).write(content)
 
     def close(self):
-        self.__mock_fs.set_data(self.__filename, self.getvalue())
+        self._mock_fs.set_data(self._filename, self.getvalue())
         super(MockStringIO, self).close()
 
 
 class MockHandlers(object):
 
     def __init__(self, file_system):
-        self.__file_system = file_system
+        self._file_system = file_system
 
-    def __path_exists(self, path, mode):
+    def _path_exists(self, path, mode):
         if not mode.startswith('r'):
             path = os.path.dirname(path)
-        if self.__file_system.get_data(path) is None:
+        if self._file_system.get_data(path) is None:
             return False
         return True
 
+    def _isdir(self, path):
+        return isinstance(self._file_system.get_data(path), dict)
+
+    def _isfile(self, path):
+        data = self._file_system.get_data(path)
+        return False if (isinstance(data, dict) or data is None) else True
+
     @override(builtins + '.open')
     def open(self, filename, mode = 'r'):
-        if not self.__path_exists(filename, mode):
+        if not self._path_exists(filename, mode):
             raise FileNotFoundError("No such file or directory: '{}'".format(filename))
 
-        return MockStringIO(filename, self.__file_system, mode)
+        return MockStringIO(filename, self._file_system, mode)
+
+    @override('io.FileIO')
+    def fileio(self, filename, mode = 'r'):
+        if not self._path_exists(filename, mode):
+            raise FileNotFoundError("No such file or directory: '{}'".format(filename))
+
+        return MockStringIO(filename, self._file_system, mode)
+
+    @override('os.listdir')
+    def listdir(self, path):
+        if not self._isdir(path):
+            raise FileNotFoundError("[Errno 2] No such file or directory: '{}'".format(path))
+
+        for name in self._file_system.get_data(path):
+            yield name
 
     @override('os.path.exists')
     def exists(self, filename):
-        return self.__file_system.get_data(filename) is not None
+        return self._file_system.get_data(filename) is not None
 
     @override('os.getcwd')
     def getcwd(self):
-        return self.__file_system.cwd
+        return self._file_system.cwd
 
     @override('os.path.expanduser')
     def expanduser(self, path):
-        return os.path.normpath(path.replace("~", "/home/{}/".format(self.__file_system.user)))
+        return os.path.normpath(path.replace("~", "/home/{}/".format(self._file_system.user)))
 
     @override('os.mkdir')
     def mkdir(self, path):
-        if self.__file_system.get_data(path) is None:
+        if self._file_system.get_data(path) is None:
             try:
-                self.__file_system.set_data(path, dict())
+                self._file_system.set_data(path, dict())
             except KeyError:
                 raise FileNotFoundError("No such file or directory: '{}'".format(path))
         else:
@@ -88,12 +110,11 @@ class MockHandlers(object):
 
     @override('os.path.isfile')
     def isfile(self, path):
-        data = self.__file_system.get_data(path)
-        return False if (isinstance(data, dict) or data is None) else True
+        return self._isfile(path)
 
     @override('os.path.isdir')
     def isdir(self, path):
-        return isinstance(self.__file_system.get_data(path), dict)
+        return self._isdir(path)
 
     @override('os.chmod')
     def chmod(self, path, flags):
@@ -103,3 +124,9 @@ class MockHandlers(object):
     @override('os.stat')
     def stat(self, path):
         return stat_result()
+
+    @override('os.remove')
+    def remove(self, path):
+        if not self._isfile(path):
+            raise FileNotFoundError("No such file or directory: '{}'".format(path))
+        self._file_system.remove_data(path)
