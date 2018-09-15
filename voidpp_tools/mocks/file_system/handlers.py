@@ -99,7 +99,7 @@ class MockHandlers(object):
         return os.path.normpath(path.replace("~", "/home/{}/".format(self._file_system.user)))
 
     @override('os.mkdir')
-    def mkdir(self, path):
+    def mkdir(self, path, mode=0o777):
         if self._file_system.get_data(path) is None:
             try:
                 self._file_system.set_data(path, dict())
