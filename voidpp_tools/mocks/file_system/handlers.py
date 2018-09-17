@@ -1,5 +1,6 @@
 import os
 from io import StringIO, FileIO
+from shutil import copyfile
 from .utils import override
 from voidpp_tools.compat import builtins, FileNotFoundError, FileExistsError, UnsupportedOperation
 
@@ -70,6 +71,14 @@ class MockHandlers(object):
             raise FileNotFoundError("No such file or directory: '{}'".format(filename))
 
         return MockStringIO(filename, self._file_system, mode)
+
+    @override('shutil.copyfile')
+    def shutil_copyfile(self, src, dst, *, follow_symlinks=True):
+        data = self._file_system.get_data(src)
+        if not data:
+            raise FileNotFoundError("No such file or directory: '{}'".format(src))
+        self._file_system.set_data(dst, data)
+        return dst
 
     @override('io.FileIO')
     def fileio(self, filename, mode = 'r'):
